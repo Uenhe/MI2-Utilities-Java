@@ -454,8 +454,8 @@ public class FullAI extends AIController{
     }
 
     public class LogicMode extends Mode{
-        public static final Seq<Class<? extends LInstruction>> bannedInstructions = new Seq<>();
-        public static LogicMode logicMode;
+        public final Seq<Class<? extends LInstruction>> bannedInstructions = new Seq<>();
+        public LogicMode logicMode;
         public LogicModeCode code;
         public Seq<LogicModeCode> codes;
 
@@ -487,7 +487,7 @@ public class FullAI extends AIController{
             btext = Iconc.blockWorldProcessor + "";
             bimg = Core.atlas.drawable("mi2-utilities-java-ui-customai");
 
-            LogicMode.logicMode.codes = Core.settings.getJson("ai.logic.codes", Seq.class, LogicModeCode.class, () -> Seq.with(new LogicModeCode("" + Iconc.edit + Iconc.map, "jump 26 strictEqual init 2\n" +
+            logicMode.codes = Core.settings.getJson("ai.logic.codes", Seq.class, LogicModeCode.class, () -> Seq.with(new LogicModeCode("" + Iconc.edit + Iconc.map, "jump 26 strictEqual init 2\n" +
                 "set brush.size 2\n" +
                 "set floor @air\n" +
                 "set ore @air\n" +
@@ -892,7 +892,7 @@ public class FullAI extends AIController{
             return false;
         }
 
-        public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, boolean closeSelect, int rows, int columns){
+        public <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, boolean closeSelect, int rows, int columns){
             ButtonGroup<ImageButton> group = new ButtonGroup<>();
             group.setMinCheckCount(0);
             Table cont = new Table().top();
@@ -929,7 +929,7 @@ public class FullAI extends AIController{
             table.top().add(main);
         }
 
-        public static class LogicModeCode{
+        public class LogicModeCode{
             String name;
             String value;
             public LogicModeCode(){}
