@@ -2,7 +2,6 @@ package mi2u.ui.elements;
 
 import arc.*;
 import arc.func.*;
-import arc.graphics.*;
 import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -254,7 +253,7 @@ public class Mindow2 extends Table{
 
         float dst1 = Float.MAX_VALUE, dst2 = Float.MAX_VALUE, dst;
         for(Mindow2 m : mindow2s){
-            if(m == this || m.mindowName.equals("")) continue;
+            if(m == this || m.mindowName.isEmpty()) continue;
             if(m.lrSnap == this || m.tbSnap == this) continue;
             if(!m.visible || !m.hasParent()) continue;
 
@@ -369,7 +368,7 @@ public class Mindow2 extends Table{
 
     /** can be overrided, should use super.initSettings(), called in rebuild() */
     public void initSettings(){
-        if(mindowName == null || mindowName.equals("")) return;
+        if(mindowName == null || mindowName.isEmpty()) return;
         if(settings == null) settings = new SettingHandler(mindowName);
         settings.list.clear();
         var sScl = settings.sliderPref("scale", 100, 20, 400, 10, s -> s + "%", scl -> setScale(scl / 100f));
@@ -381,7 +380,7 @@ public class Mindow2 extends Table{
      * rebuild() called once finished loading
      */
     public boolean loadUISettingsRaw(){
-        if(mindowName == null || mindowName.equals("")) return false;
+        if(mindowName == null || mindowName.isEmpty()) return false;
         minimized = settings.getBool("minimized");
         edgesnap = settings.getInt("edgesnap");
         curx = settings.getInt("curx");
@@ -413,7 +412,7 @@ public class Mindow2 extends Table{
      */
     public void saveUISettings(){
         //it is a not-named mindow2, no settings can be saved.
-        if(mindowName == null || mindowName.equals("")) return;
+        if(mindowName == null || mindowName.isEmpty()) return;
         settings.putBool("minimized", minimized);
         settings.putInt("edgesnap", edgesnap);
         //edgesnap will disable curx / cury changes, so they shouldn't be saved when edgesnapping.
@@ -434,7 +433,7 @@ public class Mindow2 extends Table{
     }
 
     public void registerName(){
-        if(mindowName != null && !mindowName.equals("") && !mindow2s.contains(m -> m.mindowName.equals(this.mindowName))){
+        if(mindowName != null && !mindowName.isEmpty() && !mindow2s.contains(m -> m.mindowName.equals(this.mindowName))){
             mindow2s.add(this);
         }
     }

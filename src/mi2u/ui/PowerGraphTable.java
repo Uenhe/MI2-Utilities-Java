@@ -321,7 +321,7 @@ public class PowerGraphTable extends Table{
          *  /            \
          * ----------------
          * */
-        public static void fillCurve(float fx1, float fy1, float fx2, float fy2, float tx1, float ty1, float tx2, float ty2, float segments, float dist){
+        public void fillCurve(float fx1, float fy1, float fx2, float fy2, float tx1, float ty1, float tx2, float ty2, float segments, float dist){
             float cfx1 = fx1, ctx1 = tx1, cfy1 = fy1 - dist, cty1 = ty1 + dist;
             float cfx2 = fx2, ctx2 = tx2, cfy2 = fy2 - dist, cty2 = ty2 + dist;
 

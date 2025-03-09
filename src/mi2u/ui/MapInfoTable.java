@@ -413,11 +413,14 @@ public class MapInfoTable extends Table{
                     });
                 }).with(funcSetTextb).disabled(b -> state.rules.bannedUnits.isEmpty());
 
+                //TODO commented for adapting to v147.
+                /*
                 tt.button("@mapInfo.buttons.hiddenBuildItems", textb, () -> {
                     showIterable("@mapInfo.buttons.hiddenBuildItems", state.rules.hiddenBuildItems, null, (item, table) -> {
                         table.image(item.uiIcon).size(32f);
                     });
                 }).with(funcSetTextb).disabled(b -> state.rules.hiddenBuildItems.isEmpty());
+                 */
 
                 tt.row();
 

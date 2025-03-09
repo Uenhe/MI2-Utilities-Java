@@ -27,7 +27,6 @@ import mindustry.ui.*;
 import mindustry.world.*;
 
 import static mi2u.MI2UVars.*;
-import static mi2u.io.SettingHandler.TextFieldSetting.*;
 import static mindustry.Vars.*;
 
 public class MinimapMindow extends Mindow2{
@@ -155,9 +154,9 @@ public class MinimapMindow extends Mindow2{
         settings.checkPref("drawFog", true, b -> m.drawFog = b);
         settings.checkPref("drawIndicator", true, b -> m.drawIndicator = b);
         settings.checkPref("drawObjective", true, b -> m.drawObjective = b);
-        settings.textPref("size", String.valueOf(140), TextField.TextFieldFilter.digitsOnly, s -> Strings.canParseInt(s) && Strings.parseInt(s) >= 100 && Strings.parseInt(s) <= 3200, s -> setupCont(cont), intParser);
-        settings.textPref("drawUnitColorDiff", String.valueOf(10), TextField.TextFieldFilter.digitsOnly, s -> Strings.canParseInt(s) && Strings.parseInt(s) >= 0 && Strings.parseInt(s) <= 100, s -> m.drawUnitColorDifference = Strings.parseInt(s) / 100f, intParser);
-        settings.textPref("drawUnitOutline", String.valueOf(10), TextField.TextFieldFilter.digitsOnly, s -> Strings.canParseInt(s) && Strings.parseInt(s) >= 0 && Strings.parseInt(s) <= 100, s -> m.drawUnitOutline = Strings.parseInt(s) / 100f, intParser);
+        settings.textPref("size", String.valueOf(140), TextField.TextFieldFilter.digitsOnly, s -> Strings.canParseInt(s) && Strings.parseInt(s) >= 100 && Strings.parseInt(s) <= 3200, s -> setupCont(cont), SettingHandler.intParser);
+        settings.textPref("drawUnitColorDiff", String.valueOf(10), TextField.TextFieldFilter.digitsOnly, s -> Strings.canParseInt(s) && Strings.parseInt(s) >= 0 && Strings.parseInt(s) <= 100, s -> m.drawUnitColorDifference = Strings.parseInt(s) / 100f, SettingHandler.intParser);
+        settings.textPref("drawUnitOutline", String.valueOf(10), TextField.TextFieldFilter.digitsOnly, s -> Strings.canParseInt(s) && Strings.parseInt(s) >= 0 && Strings.parseInt(s) <= 100, s -> m.drawUnitOutline = Strings.parseInt(s) / 100f, SettingHandler.intParser);
     }
     
     public static class Minimap2 extends Element{
@@ -411,6 +410,8 @@ public class MinimapMindow extends Mindow2{
                 Draw.reset();
             }
 
+            //TODO commented for adapting to v147.
+            /*
             //could be buggy
             if(drawObjective){
                 state.rules.objectives.eachRunning(obj -> {
@@ -419,6 +420,7 @@ public class MinimapMindow extends Mindow2{
                     }
                 });
             }
+            */
 
             Draw.reset();
         }

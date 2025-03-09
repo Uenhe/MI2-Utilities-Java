@@ -89,7 +89,7 @@ public class FullAI extends AIController{
         if(control.input instanceof InputOverwrite inp) inp.shoot(point, shoot, true);
     }
 
-    public class Mode{
+    public static class Mode{
         public boolean enable = false;
         public String btext;
         public Drawable bimg;
@@ -259,10 +259,10 @@ public class FullAI extends AIController{
             if(rebuild && timer.get(1, 30f) && unit.plans().isEmpty() && !unit.team.data().plans.isEmpty()){
                 //rebuild
                 var block = unit.team.data().plans.first();
-                if(world.tile(block.x, block.y) != null && world.tile(block.x, block.y).block().id == block.block){
+                if(world.tile(block.x, block.y) != null && world.tile(block.x, block.y).block() == block.block){
                     state.teams.get(player.team()).plans.remove(block);
                 }else{
-                    unit.addBuild(new BuildPlan(block.x, block.y, block.rotation, content.block(block.block), block.config));
+                    unit.addBuild(new BuildPlan(block.x, block.y, block.rotation, block.block, block.config));
                 }
 
             }
@@ -465,12 +465,12 @@ public class FullAI extends AIController{
         MI2Utils.IntervalMillis timer = new MI2Utils.IntervalMillis();
         MI2Utils.IntervalMillis actionTimer = new MI2Utils.IntervalMillis(2);
         public boolean itemTrans, payloadTrans;
-        public static StringBuffer log = new StringBuffer();
+        public StringBuffer log = new StringBuffer();
         Queue<BuildPlan> plans = new Queue<>();
 
         public PopupTable customAIUITable = new PopupTable();
 
-        public static PopupTable chooseContentTable = new PopupTable();
+        public PopupTable chooseContentTable = new PopupTable();
 
         //public int lastPathId = 0;
         //public float lastMoveX, lastMoveY;
@@ -488,65 +488,65 @@ public class FullAI extends AIController{
             bimg = Core.atlas.drawable("mi2-utilities-java-ui-customai");
 
             LogicMode.logicMode.codes = Core.settings.getJson("ai.logic.codes", Seq.class, LogicModeCode.class, () -> Seq.with(new LogicModeCode("" + Iconc.edit + Iconc.map, "jump 26 strictEqual init 2\n" +
-                    "set brush.size 2\n" +
-                    "set floor @air\n" +
-                    "set ore @air\n" +
-                    "set block @air\n" +
-                    "set title \"TerraEditor\"\n" +
-                    "set text.ipt \"Ipt\"\n" +
-                    "set ipt 50\n" +
-                    "print \"UI.info(title)\"\n" +
-                    "print \"UI.row()\"\n" +
-                    "print \"UI.info(text.ipt)\"\n" +
-                    "print \"UI.field(ipt)\"\n" +
-                    "print \"UI.row()\"\n" +
-                    "print \"UI.choose(floor)\"\n" +
-                    "print \"UI.info(floor)\"\n" +
-                    "print \"UI.row()\"\n" +
-                    "print \"UI.choose(ore)\"\n" +
-                    "print \"UI.info(ore)\"\n" +
-                    "print \"UI.row()\"\n" +
-                    "print \"UI.info(brush.name)\"\n" +
-                    "print \"UI.button(brush.type)\"\n" +
-                    "print \"UI.row()\"\n" +
-                    "print \"UI.info(brush.size.name)\"\n" +
-                    "print \"UI.field(brush.size)\"\n" +
-                    "set init 2\n" +
-                    "set brush.size.name \"Radius\"\n" +
-                    "sensor en @unit @shooting\n" +
-                    "set brush.name \"suqare\"\n" +
-                    "jump 30 equal brush.type 0\n" +
-                    "set brush.name \"circle\"\n" +
-                    "sensor tx @unit @shootX\n" +
-                    "op add tx tx 0.5\n" +
-                    "op idiv tx tx 1\n" +
-                    "sensor ty @unit @shootY\n" +
-                    "op add ty ty 0.5\n" +
-                    "op idiv ty ty 1\n" +
-                    "op sub x.min tx brush.size\n" +
-                    "op idiv x.min x.min 1\n" +
-                    "op add x.max x.min brush.size\n" +
-                    "op add x.max x.max brush.size\n" +
-                    "op sub y.min ty brush.size\n" +
-                    "op idiv y.min y.min 1\n" +
-                    "op add y.max y.min brush.size\n" +
-                    "op add y.max y.max brush.size\n" +
-                    "set x x.min\n" +
-                    "op add x x 1\n" +
-                    "set y y.min\n" +
-                    "op add y y 1\n" +
-                    "jump 53 equal brush.type 0\n" +
-                    "op sub dx x tx\n" +
-                    "op sub dy y ty\n" +
-                    "op len d dx dy\n" +
-                    "jump 57 greaterThan d brush.size\n" +
-                    "effect lightBlock x y 0.5 %ffbd530f \n" +
-                    "jump 57 notEqual en 1\n" +
-                    "setblock floor floor x y @derelict 0\n" +
-                    "setblock ore ore x y @derelict 0\n" +
-                    "jump 47 lessThan y y.max\n" +
-                    "setrate ipt\n" +
-                    "jump 45 lessThan x x.max\n")));
+                "set brush.size 2\n" +
+                "set floor @air\n" +
+                "set ore @air\n" +
+                "set block @air\n" +
+                "set title \"TerraEditor\"\n" +
+                "set text.ipt \"Ipt\"\n" +
+                "set ipt 50\n" +
+                "print \"UI.info(title)\"\n" +
+                "print \"UI.row()\"\n" +
+                "print \"UI.info(text.ipt)\"\n" +
+                "print \"UI.field(ipt)\"\n" +
+                "print \"UI.row()\"\n" +
+                "print \"UI.choose(floor)\"\n" +
+                "print \"UI.info(floor)\"\n" +
+                "print \"UI.row()\"\n" +
+                "print \"UI.choose(ore)\"\n" +
+                "print \"UI.info(ore)\"\n" +
+                "print \"UI.row()\"\n" +
+                "print \"UI.info(brush.name)\"\n" +
+                "print \"UI.button(brush.type)\"\n" +
+                "print \"UI.row()\"\n" +
+                "print \"UI.info(brush.size.name)\"\n" +
+                "print \"UI.field(brush.size)\"\n" +
+                "set init 2\n" +
+                "set brush.size.name \"Radius\"\n" +
+                "sensor en @unit @shooting\n" +
+                "set brush.name \"suqare\"\n" +
+                "jump 30 equal brush.type 0\n" +
+                "set brush.name \"circle\"\n" +
+                "sensor tx @unit @shootX\n" +
+                "op add tx tx 0.5\n" +
+                "op idiv tx tx 1\n" +
+                "sensor ty @unit @shootY\n" +
+                "op add ty ty 0.5\n" +
+                "op idiv ty ty 1\n" +
+                "op sub x.min tx brush.size\n" +
+                "op idiv x.min x.min 1\n" +
+                "op add x.max x.min brush.size\n" +
+                "op add x.max x.max brush.size\n" +
+                "op sub y.min ty brush.size\n" +
+                "op idiv y.min y.min 1\n" +
+                "op add y.max y.min brush.size\n" +
+                "op add y.max y.max brush.size\n" +
+                "set x x.min\n" +
+                "op add x x 1\n" +
+                "set y y.min\n" +
+                "op add y y 1\n" +
+                "jump 53 equal brush.type 0\n" +
+                "op sub dx x tx\n" +
+                "op sub dy y ty\n" +
+                "op len d dx dy\n" +
+                "jump 57 greaterThan d brush.size\n" +
+                "effect lightBlock x y 0.5 %ffbd530f \n" +
+                "jump 57 notEqual en 1\n" +
+                "setblock floor floor x y @derelict 0\n" +
+                "setblock ore ore x y @derelict 0\n" +
+                "jump 47 lessThan y y.max\n" +
+                "setrate ipt\n" +
+                "jump 45 lessThan x x.max\n")));
             code = codes.first();
             readCode(code.value);
 
@@ -649,7 +649,7 @@ public class FullAI extends AIController{
 
         @Override
         public void act(){
-            exec.vars[exec.iptIndex].numval = instructionsPerTick;
+            exec.vars[exec.ipt.numi()].numval = instructionsPerTick;
             var ctrl = unit.controller();
             unit.controller(ai);
 
@@ -664,7 +664,7 @@ public class FullAI extends AIController{
             if(unit.plans != null) unit.plans.each(bp -> plans.add(bp));
             for(int i = 0; i < Mathf.clamp(instructionsPerTick, 1, 2000); i++){
                 if(exec.instructions.length == 0) break;
-                exec.setconst(LExecutor.varUnit, unit);
+                exec.unit.setconst(unit);
                 if(tryRunOverwrite(exec.instructions[Mathf.mod((int)(exec.counter.numval), exec.instructions.length)])){
                     exec.counter.numval++;
                     continue;
@@ -738,12 +738,12 @@ public class FullAI extends AIController{
 
         public boolean tryRunOverwrite(LInstruction inst){
             if(inst instanceof SetRateI sr){
-                instructionsPerTick = exec.numi(sr.amount);
+                instructionsPerTick = sr.amount.numi();
                 return true;
             }else if(inst instanceof ControlI li){
-                if(!player.dead() && exec.obj(li.target) instanceof Building b && (isLocalSandbox() || b.team == exec.team)){
+                if(!player.dead() && li.target.obj() instanceof Building b && (isLocalSandbox() || b.team == exec.team)){
                     if(li.type == LAccess.config){
-                        b.configured(player.unit(), exec.obj(li.p1));
+                        b.configured(player.unit(), li.p1.obj());
                     }
                 }
                 return true;
@@ -770,24 +770,24 @@ public class FullAI extends AIController{
                         return false;
                     }
                     case itemTake -> {
-                        if(!(exec.obj(li.p2) instanceof Item item)) return false;
+                        if(!(li.p2.obj() instanceof Item item)) return false;
                         if(!itemTrans || player.unit() == null || !player.unit().acceptsItem(item)) return false;
-                        Building build = exec.building(li.p1);
+                        Building build = li.p1.building();
                         if(build != null && build.team == unit.team && build.isValid() && build.items != null && unit.within(build, itemTransferRange + build.block.size * tilesize/2f)){
-                            Call.requestItem(player, build, item, exec.numi(li.p3));
+                            Call.requestItem(player, build, item, li.p3.numi());
                             itemTrans = false;
                         }
                         return true;
                     }
                     case itemDrop -> {
                         if(!itemTrans || player.unit() == null || player.unit().stack.amount == 0) return false;
-                        Building build = exec.building(li.p1);
+                        Building build = li.p1.building();
                         if(build != null && unit.within(build, itemTransferRange + build.block.size * tilesize/2f)){
                             control.input.droppingItem = true;
                             control.input.tryDropItems(build, 0f, 0f);
                             control.input.droppingItem = false;
                             itemTrans = false;
-                        }else if(exec.obj(li.p1) == Blocks.air){
+                        }else if(li.p1.obj() == Blocks.air){
                             control.input.tryDropItems(null, 0f, 0f);
                             itemTrans = false;
                         }
@@ -827,8 +827,13 @@ public class FullAI extends AIController{
 
         public boolean printUI(PrintI inst){
             //format: UI.type(var)
-            var text = exec.var(inst.value);
-            var str = text.isobj && inst.value != 0 ? PrintI.toString(text.objval) : String.valueOf(text.numval);
+            String str;
+            if(inst.value.isobj){
+                str = LExecutor.PrintI.toString(inst.value.objval);
+            }else{
+                str = String.valueOf(inst.value.numval);
+            }
+
             if(!str.endsWith(")")) return false;
             String[] blocks = str.substring(0, str.length() - 1).split("\\.|\\(", 3);
 
@@ -846,35 +851,34 @@ public class FullAI extends AIController{
             if(blocks.length < 3) return false;
             var targetName = blocks[2];
             for(int i = 0; i < exec.vars.length; i++){
-                if(exec.var(i).name.equals(targetName)){
-                    int tgt = i;
+                if(exec.optionalVar(i).name.equals(targetName)){
+                    var lvar = exec.optionalVar(i);
                     if(customAIUITable.getChildren().size > 60) return false;//no too many uis
                     switch(type){
-                        case "button" -> customAIUITable.button(targetName, textbtoggle, () -> exec.setbool(tgt, !exec.bool(tgt))).update(tb -> tb.setChecked(exec.bool(tgt)));
-                        case "field" -> customAIUITable.field(String.valueOf(exec.num(tgt)), TextField.TextFieldFilter.floatsOnly, s -> exec.setnum(tgt, Strings.parseDouble(s, 0)));
+                        case "button" -> customAIUITable.button(targetName, textbtoggle, () -> lvar.setbool(!lvar.bool())).update(tb -> tb.setChecked(lvar.bool()));
+                        case "field" -> customAIUITable.field(String.valueOf(lvar.num()), TextField.TextFieldFilter.floatsOnly, s -> lvar.setnum(Strings.parseDouble(s, 0)));
                         case "choose" -> {
-                            if(exec.var(tgt).isobj && !(exec.obj(tgt) instanceof MappableContent)) return false;
+                            if(lvar.isobj && !(lvar.objval instanceof MappableContent)) return false;
                             customAIUITable.button(targetName, textb, () -> {
                                 chooseContentTable.clear();
                                 chooseContentTable.addDragMove();
                                 chooseContentTable.addCloseButton();
                                 chooseContentTable.visible(() -> state.isGame());
-                                buildTable(chooseContentTable, new Seq<UnlockableContent>().add(content.items()).add(content.liquids()).add(content.statusEffects()).add(content.blocks()).add(content.units()), () -> exec.obj(tgt) instanceof UnlockableContent uc ? uc : null, content -> exec.setobj(tgt, content), false, 8, 8);
+                                buildTable(chooseContentTable, new Seq<UnlockableContent>().add(content.items()).add(content.liquids()).add(content.statusEffects()).add(content.blocks()).add(content.units()), () -> lvar.obj() instanceof UnlockableContent uc ? uc : null, lvar::setobj, false, 8, 8);
                                 chooseContentTable.popup();
                                 chooseContentTable.snapTo(customAIUITable);
                             });
                         }
                         case "info" -> {
-
                             customAIUITable.add("").fill().with(b -> {
                                 b.setFontScale(0.7f);
                                 b.clicked(() -> b.cullable = !b.cullable);
                                 b.update(() -> {
-                                    b.setText(PrintI.toString(exec.obj(tgt)));
+                                    b.setText(PrintI.toString(lvar.obj()));
                                     b.setColor(b.cullable ? Color.cyan : Color.white);
-                                    if(b.hasMouse()) HoverTopTable.hoverInfo.setHovered(exec.obj(tgt));
+                                    if(b.hasMouse()) HoverTopTable.hoverInfo.setHovered(lvar.obj());
                                     if(b.cullable){
-                                        if(exec.obj(tgt) instanceof Posc posc && control.input instanceof InputOverwrite ipo){
+                                        if(lvar.obj() instanceof Posc posc && control.input instanceof InputOverwrite ipo){
                                             ipo.pan(true, MI2UTmp.v1.set(posc));
                                         }
                                     }
