@@ -82,7 +82,7 @@ public class ModifyFuncs{
                 //do nothing
             }else if(block.hasPower && block.consumesPower && block.consPower != null){
                 addBarToBlock(block, "power", entity -> new Bar(() -> block.consPower.buffered ? Core.bundle.format("bar.poweramount", Float.isNaN(entity.power.status * block.consPower.capacity) ? "<ERROR>" : UI.formatAmount((int)(entity.power.status * block.consPower.capacity))) :
-                        Core.bundle.get("bar.power") + ":" + Strings.autoFixed((entity.status() == BlockStatus.active ? 1f : 0f) * entity.efficiency() * -entity.power.status * block.consPower.usage * 60f * (entity.canConsume()?entity.timeScale():0),2), () -> Pal.powerBar, () -> Mathf.zero(block.consPower.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status));
+                        Core.bundle.get("bar.power") + ":" + Strings.autoFixed((entity.status() == BlockStatus.active ? 1f : 0f) * entity.efficiency * -entity.power.status * block.consPower.usage * 60f * (entity.canConsume()?entity.timeScale():0),2), () -> Pal.powerBar, () -> Mathf.zero(block.consPower.requestedPower(entity)) && entity.power.graph.getPowerProduced() + entity.power.graph.getBatteryStored() > 0f ? 1f : entity.power.status));
             }
 
             if(block instanceof Turret tu){

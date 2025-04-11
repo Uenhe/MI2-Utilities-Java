@@ -35,6 +35,8 @@ import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
 
+import java.util.Objects;
+
 import static mi2u.MI2UVars.*;
 import static mindustry.Vars.*;
 
@@ -147,7 +149,7 @@ public class FullAI extends AIController{
                             var seq = content.blocks().select(b -> (b.solid || (b instanceof Floor f && f.wallOre)) && b.itemDrop == targetItem);
                             for(var block : seq){
                                 if(WorldData.countBlock(block, null) > 0){
-                                    WorldData.getSeq(block, null).each(pos -> {
+                                    Objects.requireNonNull(WorldData.getSeq(block, null)).each(pos -> {
                                         if(ore != null && unit.within(ore, unit.type.mineRange)) return;
                                         if((ore == null || MI2UTmp.v3.set(ore).sub(unit).len2() > MI2UTmp.v2.set(Point2.x(pos), Point2.y(pos)).scl(tilesize).sub(unit).len2()) && world.tile(pos).wallDrop()== targetItem) ore = world.tile(pos);
                                     });
