@@ -19,9 +19,6 @@ import static mi2u.MI2UVars.*;
 
 public class SettingHandler{
     public static boolean debug;
-    public static Func<String, Object> intParser = Strings::parseInt;
-    public static Func<String, Object> floatParser = Strings::parseFloat;
-    public static Func<String, Object> boolParser = s -> s.equals("true");
     public String prefix;
     public Seq<Setting> list = new Seq<>();
 
@@ -383,5 +380,7 @@ public class SettingHandler{
                 if(!tf.hasKeyboard()) tf.setText(String.valueOf(settings.get(name, def)));
             });
         }
+
+        public static Func<String, Object> intParser = Strings::parseInt, floatParser = Strings::parseFloat, boolParser = s -> s.equals("true");
     }
 }

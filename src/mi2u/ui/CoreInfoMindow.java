@@ -6,6 +6,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.*;
+import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -13,7 +14,6 @@ import arc.util.*;
 import arc.util.pooling.*;
 import mi2u.*;
 import mi2u.input.*;
-import mi2u.io.SettingHandler;
 import mi2u.struct.*;
 import mi2u.ui.elements.*;
 import mindustry.content.*;
@@ -27,6 +27,7 @@ import mindustry.world.blocks.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mi2u.MI2UVars.*;
+import static mi2u.io.SettingHandler.TextFieldSetting.*;
 import static mindustry.Vars.*;
 
 public class CoreInfoMindow extends Mindow2{
@@ -273,7 +274,7 @@ public class CoreInfoMindow extends Mindow2{
                     req.add(stack.item, Mathf.floor(stack.amount * (plan.breaking ? (cbhas ? cbprog : 1f) * state.rules.deconstructRefundMultiplier*state.rules.buildCostMultiplier : (cbhas ? cbprog - 1f : -1f) * state.rules.buildCostMultiplier)));
                 }
 
-                time[0] += (cbhas ? cbb : plan.block.buildTime) * state.rules.buildCostMultiplier * (cbhas ? (plan.breaking ? cbprog : 1f - cbprog) : 1f) / 60f / (player.unit().type.buildSpeed * player.unit().buildSpeedMultiplier * state.rules.buildSpeed(player.team()));
+                time[0] += (cbhas?cbb:plan.block.buildTime) * state.rules.buildCostMultiplier * (cbhas ? (plan.breaking ? cbprog : 1f - cbprog) : 1f) / 60f / (player.unit().type.buildSpeed * player.unit().buildSpeedMultiplier * state.rules.buildSpeed(player.team()));
             });
 
             control.input.selectPlans.each(plan -> {
@@ -290,7 +291,7 @@ public class CoreInfoMindow extends Mindow2{
                     req2.add(stack.item, Mathf.floor(stack.amount * (plan.breaking ? (cbhas ? cbprog : 1f) * state.rules.deconstructRefundMultiplier*state.rules.buildCostMultiplier : (cbhas ? cbprog - 1f : -1f) * state.rules.buildCostMultiplier)));
                 }
 
-                time[1] += (cbhas ? cbb : plan.block.buildTime) * state.rules.buildCostMultiplier * (cbhas ? (plan.breaking ? cbprog : 1f - cbprog) : 1f) / 60f / (player.unit().type.buildSpeed * player.unit().buildSpeedMultiplier * state.rules.buildSpeed(player.team()));
+                time[1] += (cbhas?cbb:plan.block.buildTime) * state.rules.buildCostMultiplier * (cbhas ? (plan.breaking ? cbprog : 1f - cbprog) : 1f) / 60f / (player.unit().type.buildSpeed * player.unit().buildSpeedMultiplier * state.rules.buildSpeed(player.team()));
             });
 
             if(buildPlanTable.getChildren().find(e -> e.name != null && e.name.equals("bpt-time")) instanceof Label l){
@@ -353,8 +354,8 @@ public class CoreInfoMindow extends Mindow2{
         settings.checkPref("showUnits", true, b -> rebuild());
         settings.sliderPref("unitIconSize", 28, 12, 64, 4, i -> "" + i, i -> rebuild());
         settings.checkPref("showPowerGraphs", true, b -> rebuild());
-        settings.textPref("itemsMaxHeight", String.valueOf(150), TextField.TextFieldFilter.digitsOnly, s -> Strings.canParseInt(s) && Strings.parseInt(s) >= 50 && Strings.parseInt(s) <= 500, s -> rebuild(), SettingHandler.intParser);
-        settings.textPref("unitsMaxHeight", String.valueOf(200), TextField.TextFieldFilter.digitsOnly, s -> Strings.canParseInt(s) && Strings.parseInt(s) >= 50 && Strings.parseInt(s) <= 500, s -> rebuild(), SettingHandler.intParser);
+        settings.textPref("itemsMaxHeight", String.valueOf(150), TextField.TextFieldFilter.digitsOnly, s -> Strings.canParseInt(s) && Strings.parseInt(s) >= 50 && Strings.parseInt(s) <= 500, s -> rebuild(), intParser);
+        settings.textPref("unitsMaxHeight", String.valueOf(200), TextField.TextFieldFilter.digitsOnly, s -> Strings.canParseInt(s) && Strings.parseInt(s) >= 50 && Strings.parseInt(s) <= 500, s -> rebuild(), intParser);
     }
 
     public @Nullable PopupTable getItemChart(Item item){

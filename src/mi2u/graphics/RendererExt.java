@@ -170,7 +170,7 @@ public class RendererExt{
             }
             if(disableBullet && d instanceof Bullet b){
                 Groups.draw.removeIndex(b, MI2Utils.getValue(drawIndexBullet, b));
-                ((Bullet)d).setIndex__draw(-1);
+                b.setIndex__draw(-1);
             }
         });
 
@@ -302,7 +302,9 @@ public class RendererExt{
                         Fill.arc(unit.x, unit.y, 6f, 1f - Mathf.clamp(logicai.controlTimer / LogicAI.logicControlTimeout), 90f, 20);
                         IntFloatMap utimer = MI2Utils.getValue(lexecTimer, lb.executor);
                         Draw.color(0.2f, 1f, 0.2f, 0.6f);
-                        Fill.arc(unit.x, unit.y, 4f, 1f - Mathf.clamp((Time.time - utimer.get(unit.id)) / LogicAI.transferDelay), 90f, 16);
+                        if(utimer != null){
+                            Fill.arc(unit.x, unit.y, 4f, 1f - Mathf.clamp((Time.time - utimer.get(unit.id)) / LogicAI.transferDelay), 90f, 16);
+                        }
                     }
 
                     if(Mathf.len(logicai.moveX - unit.x, logicai.moveY - unit.y) <= 3200f){
@@ -311,7 +313,7 @@ public class RendererExt{
                         if(logicai.control == LUnitControl.pathfind && !unit.isFlying()){
                             Draw.color(Color.blue, Color.gray, Mathf.absin(Time.time, 8f, 1f));
                             Draw.alpha(0.8f);
-                            drawUnitPath(unit, MI2Utils.getValue(logicai, "lastPathId"), MI2UTmp.v2.set(logicai.moveX, logicai.moveY));
+                            drawUnitPath(unit, MI2UTmp.v2.set(logicai.moveX, logicai.moveY));
                         }else{
                             Draw.color(Color.blue, 0.8f);
                             Lines.dashLine(unit.x, unit.y, logicai.moveX, logicai.moveY, (int) (Mathf.len(logicai.moveX - unit.x, logicai.moveY - unit.y) / 8));
@@ -352,7 +354,7 @@ public class RendererExt{
 
                     if(unit.isGrounded()){
                         Draw.color(unit.team.color, Color.lightGray, Mathf.absin(Time.time, 8f, 1f));
-                        drawUnitPath(unit, MI2Utils.getValue(ai, "pathId"), ai.targetPos);
+                        drawUnitPath(unit, ai.targetPos);
                     }
 
                     if(ai.targetPos != null){
@@ -384,13 +386,12 @@ public class RendererExt{
         }
     }
 
-    public static void drawUnitPath(Unit unit, int pathId, Vec2 destination){
+    /** TODO this is barely modified to adapt to 147, and might have many bugs. */
+    public static void drawUnitPath(Unit unit, Vec2 destination){
         try{
             Tile tile = unit.tileOn();
-            ObjectMap requests = MI2Utils.getValue(controlPath, "requests");
-            Object req = requests.get(unit);
-            IntSeq result = MI2Utils.getValue(req, "result");
-            int start = MI2Utils.getValue(req, "rayPathIndex");
+            IntSeq result = MI2Utils.getValue(((ObjectMap<Unit, ?>)MI2Utils.getValue(controlPath, "unitRequests")).get(unit), "resultPath");
+            int start = Reflect.invoke(controlPath, "findClosestNode", new Object[]{unit.team, unit.type.pathCostId, unit.x, unit.y}, Team.class, Integer.class, Float.class, Float.class);
             for(int tileIndex = start; tileIndex < result.size; tileIndex++){
                 Tile nextTile = world.tiles.geti(result.get(tileIndex));
                 if(nextTile == null) break;
@@ -403,8 +404,7 @@ public class RendererExt{
                 tile = nextTile;
             }
         }catch(Exception ignore){
-            boolean move = controlPath.getPathPosition(unit, MI2UTmp.v1, destination, null);
-            if(move){
+            if(controlPath.getPathPosition(unit, destination, MI2UTmp.v1, null)){
                 Lines.dashLine(unit.x, unit.y, MI2UTmp.v1.x, MI2UTmp.v1.y, (int)(Mathf.len(MI2UTmp.v1.x - unit.x, MI2UTmp.v1.y - unit.y) / 4f));
             }
         }
@@ -577,7 +577,6 @@ public class RendererExt{
             offy += 2f;
 
             drawText((uf.unit() == null ? "":uf.unit().emoji()) + (Strings.autoFixed(barLength * 100f, 1) + "% | " + Strings.autoFixed(uf.plan().time * (1 - uf.progress) / (60f * state.rules.unitBuildSpeed(uf.team) * uf.timeScale()), 1)), uf.x, uf.y + offy, Pal.accent, uf.block.size > 3 ? 1.0f : 0.8f, Align.center);
-            offy += 2f;
         }
 
         Draw.color();

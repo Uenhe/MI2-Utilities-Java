@@ -20,6 +20,7 @@ import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.type.Item;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
@@ -413,14 +414,17 @@ public class MapInfoTable extends Table{
                     });
                 }).with(funcSetTextb).disabled(b -> state.rules.bannedUnits.isEmpty());
 
-                //TODO commented for adapting to v147.
-                /*
+                Seq<Item> hiddenBuildItems = new Seq<>();
+                for(Item item : content.items()){
+                    if(!item.isOnPlanet(state.getPlanet())){
+                        hiddenBuildItems.add(item);
+                    }
+                }
                 tt.button("@mapInfo.buttons.hiddenBuildItems", textb, () -> {
-                    showIterable("@mapInfo.buttons.hiddenBuildItems", state.rules.hiddenBuildItems, null, (item, table) -> {
+                    showIterable("@mapInfo.buttons.hiddenBuildItems", hiddenBuildItems, null, (item, table) -> {
                         table.image(item.uiIcon).size(32f);
                     });
-                }).with(funcSetTextb).disabled(b -> state.rules.hiddenBuildItems.isEmpty());
-                 */
+                }).with(funcSetTextb).disabled(b -> hiddenBuildItems.isEmpty());
 
                 tt.row();
 

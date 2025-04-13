@@ -12,7 +12,7 @@ import mindustry.input.*;
 
 import static mindustry.Vars.*;
 
-/** @Author 工业2*/
+/** @author 工业2*/
 public class MI2UFuncs{
     public static Vec2 tmp1 = new Vec2(), tmp2 = new Vec2(), tmp3 = new Vec2(), tmp4 = new Vec2();
     public static void unitRebuildBlocks(){

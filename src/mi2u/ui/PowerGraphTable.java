@@ -321,9 +321,9 @@ public class PowerGraphTable extends Table{
          *  /            \
          * ----------------
          * */
-        public void fillCurve(float fx1, float fy1, float fx2, float fy2, float tx1, float ty1, float tx2, float ty2, float segments, float dist){
-            float cfy1 = fy1 - dist, cty1 = ty1 + dist;
-            float cfy2 = fy2 - dist, cty2 = ty2 + dist;
+        public static void fillCurve(float fx1, float fy1, float fx2, float fy2, float tx1, float ty1, float tx2, float ty2, float segments, float dist){
+            float cfx1 = fx1, ctx1 = tx1, cfy1 = fy1 - dist, cty1 = ty1 + dist;
+            float cfx2 = fx2, ctx2 = tx2, cfy2 = fy2 - dist, cty2 = ty2 + dist;
 
             float subdiv_step = 1f / segments;
             float subdiv_step2 = subdiv_step * subdiv_step;
@@ -334,14 +334,14 @@ public class PowerGraphTable extends Table{
             float pre4 = 6 * subdiv_step2;
             float pre5 = 6 * subdiv_step3;
 
-            float tmp1x1 = fx1 - fx1 * 2 + tx1;
+            float tmp1x1 = fx1 - cfx1 * 2 + ctx1;
             float tmp1y1 = fy1 - cfy1 * 2 + cty1;
-            float tmp1x2 = fx2 - fx2 * 2 + tx2;
+            float tmp1x2 = fx2 - cfx2 * 2 + ctx2;
             float tmp1y2 = fy2 - cfy2 * 2 + cty2;
 
-            float tmp2x1 = (fx1 - tx1) * 3 - fx1 + tx1;
+            float tmp2x1 = (cfx1 - ctx1) * 3 - fx1 + tx1;
             float tmp2y1 = (cfy1 - cty1) * 3 - fy1 + ty1;
-            float tmp2x2 = (fx2 - tx2) * 3 - fx2 + tx2;
+            float tmp2x2 = (cfx2 - ctx2) * 3 - fx2 + tx2;
             float tmp2y2 = (cfy2 - cty2) * 3 - fy2 + ty2;
 
             float f1x = fx1;
@@ -349,9 +349,9 @@ public class PowerGraphTable extends Table{
             float f2x = fx2;
             float f2y = fy2;
 
-            float dfx1 = tmp1x1 * pre2 + tmp2x1 * subdiv_step3;
+            float dfx1 = (cfx1 - fx1) * pre1 + tmp1x1 * pre2 + tmp2x1 * subdiv_step3;
             float dfy1 = (cfy1 - fy1) * pre1 + tmp1y1 * pre2 + tmp2y1 * subdiv_step3;
-            float dfx2 = tmp1x2 * pre2 + tmp2x2 * subdiv_step3;
+            float dfx2 = (cfx2 - fx2) * pre1 + tmp1x2 * pre2 + tmp2x2 * subdiv_step3;
             float dfy2 = (cfy2 - fy2) * pre1 + tmp1y2 * pre2 + tmp2y2 * subdiv_step3;
 
             float ddfx1 = tmp1x1 * pre4 + tmp2x1 * pre5;

@@ -35,8 +35,6 @@ import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
 
-import java.util.Objects;
-
 import static mi2u.MI2UVars.*;
 import static mindustry.Vars.*;
 
@@ -149,7 +147,7 @@ public class FullAI extends AIController{
                             var seq = content.blocks().select(b -> (b.solid || (b instanceof Floor f && f.wallOre)) && b.itemDrop == targetItem);
                             for(var block : seq){
                                 if(WorldData.countBlock(block, null) > 0){
-                                    Objects.requireNonNull(WorldData.getSeq(block, null)).each(pos -> {
+                                    WorldData.getSeq(block, null).each(pos -> {
                                         if(ore != null && unit.within(ore, unit.type.mineRange)) return;
                                         if((ore == null || MI2UTmp.v3.set(ore).sub(unit).len2() > MI2UTmp.v2.set(Point2.x(pos), Point2.y(pos)).scl(tilesize).sub(unit).len2()) && world.tile(pos).wallDrop()== targetItem) ore = world.tile(pos);
                                     });
@@ -260,11 +258,11 @@ public class FullAI extends AIController{
 
             if(rebuild && timer.get(1, 30f) && unit.plans().isEmpty() && !unit.team.data().plans.isEmpty()){
                 //rebuild
-                var block = unit.team.data().plans.first();
-                if(world.tile(block.x, block.y) != null && world.tile(block.x, block.y).block() == block.block){
-                    state.teams.get(player.team()).plans.remove(block);
+                var plan = unit.team.data().plans.first();
+                if(world.tile(plan.x, plan.y) != null && world.tile(plan.x, plan.y).block() == plan.block){
+                    state.teams.get(player.team()).plans.remove(plan);
                 }else{
-                    unit.addBuild(new BuildPlan(block.x, block.y, block.rotation, block.block, block.config));
+                    unit.addBuild(new BuildPlan(plan.x, plan.y, plan.rotation, plan.block, plan.config));
                 }
 
             }
@@ -395,7 +393,7 @@ public class FullAI extends AIController{
         }
         @Override
         public void act(){
-            if(unit.dead || !unit.isValid()) return;
+            if(unit == null || unit.dead || !unit.isValid()) return;
 
             if(targetItem != null && (unit.stack.item != targetItem || unit.stack.amount < 10)){
                 Building core = unit.closestCore();
@@ -456,8 +454,8 @@ public class FullAI extends AIController{
     }
 
     public class LogicMode extends Mode{
-        public final Seq<Class<? extends LInstruction>> bannedInstructions = new Seq<>();
-        public LogicMode logicMode;
+        public static final Seq<Class<? extends LInstruction>> bannedInstructions = new Seq<>();
+        public static LogicMode logicMode;
         public LogicModeCode code;
         public Seq<LogicModeCode> codes;
 
@@ -467,12 +465,12 @@ public class FullAI extends AIController{
         MI2Utils.IntervalMillis timer = new MI2Utils.IntervalMillis();
         MI2Utils.IntervalMillis actionTimer = new MI2Utils.IntervalMillis(2);
         public boolean itemTrans, payloadTrans;
-        public StringBuffer log = new StringBuffer();
+        public static StringBuffer log = new StringBuffer();
         Queue<BuildPlan> plans = new Queue<>();
 
         public PopupTable customAIUITable = new PopupTable();
 
-        public PopupTable chooseContentTable = new PopupTable();
+        public static PopupTable chooseContentTable = new PopupTable();
 
         //public int lastPathId = 0;
         //public float lastMoveX, lastMoveY;
@@ -489,66 +487,68 @@ public class FullAI extends AIController{
             btext = Iconc.blockWorldProcessor + "";
             bimg = Core.atlas.drawable("mi2-utilities-java-ui-customai");
 
-            logicMode.codes = Core.settings.getJson("ai.logic.codes", Seq.class, LogicModeCode.class, () -> Seq.with(new LogicModeCode("" + Iconc.edit + Iconc.map, "jump 26 strictEqual init 2\n" +
-                "set brush.size 2\n" +
-                "set floor @air\n" +
-                "set ore @air\n" +
-                "set block @air\n" +
-                "set title \"TerraEditor\"\n" +
-                "set text.ipt \"Ipt\"\n" +
-                "set ipt 50\n" +
-                "print \"UI.info(title)\"\n" +
-                "print \"UI.row()\"\n" +
-                "print \"UI.info(text.ipt)\"\n" +
-                "print \"UI.field(ipt)\"\n" +
-                "print \"UI.row()\"\n" +
-                "print \"UI.choose(floor)\"\n" +
-                "print \"UI.info(floor)\"\n" +
-                "print \"UI.row()\"\n" +
-                "print \"UI.choose(ore)\"\n" +
-                "print \"UI.info(ore)\"\n" +
-                "print \"UI.row()\"\n" +
-                "print \"UI.info(brush.name)\"\n" +
-                "print \"UI.button(brush.type)\"\n" +
-                "print \"UI.row()\"\n" +
-                "print \"UI.info(brush.size.name)\"\n" +
-                "print \"UI.field(brush.size)\"\n" +
-                "set init 2\n" +
-                "set brush.size.name \"Radius\"\n" +
-                "sensor en @unit @shooting\n" +
-                "set brush.name \"suqare\"\n" +
-                "jump 30 equal brush.type 0\n" +
-                "set brush.name \"circle\"\n" +
-                "sensor tx @unit @shootX\n" +
-                "op add tx tx 0.5\n" +
-                "op idiv tx tx 1\n" +
-                "sensor ty @unit @shootY\n" +
-                "op add ty ty 0.5\n" +
-                "op idiv ty ty 1\n" +
-                "op sub x.min tx brush.size\n" +
-                "op idiv x.min x.min 1\n" +
-                "op add x.max x.min brush.size\n" +
-                "op add x.max x.max brush.size\n" +
-                "op sub y.min ty brush.size\n" +
-                "op idiv y.min y.min 1\n" +
-                "op add y.max y.min brush.size\n" +
-                "op add y.max y.max brush.size\n" +
-                "set x x.min\n" +
-                "op add x x 1\n" +
-                "set y y.min\n" +
-                "op add y y 1\n" +
-                "jump 53 equal brush.type 0\n" +
-                "op sub dx x tx\n" +
-                "op sub dy y ty\n" +
-                "op len d dx dy\n" +
-                "jump 57 greaterThan d brush.size\n" +
-                "effect lightBlock x y 0.5 %ffbd530f \n" +
-                "jump 57 notEqual en 1\n" +
-                "setblock floor floor x y @derelict 0\n" +
-                "setblock ore ore x y @derelict 0\n" +
-                "jump 47 lessThan y y.max\n" +
-                "setrate ipt\n" +
-                "jump 45 lessThan x x.max\n")));
+            logicMode.codes = Core.settings.getJson("ai.logic.codes", Seq.class, LogicModeCode.class, () -> Seq.with(new LogicModeCode("" + Iconc.edit + Iconc.map, """
+                jump 26 strictEqual init 2
+                set brush.size 2
+                set floor @air
+                set ore @air
+                set block @air
+                set title "TerraEditor"
+                set text.ipt "Ipt"
+                set ipt 50
+                print "UI.info(title)"
+                print "UI.row()"
+                print "UI.info(text.ipt)"
+                print "UI.field(ipt)"
+                print "UI.row()"
+                print "UI.choose(floor)"
+                print "UI.info(floor)"
+                print "UI.row()"
+                print "UI.choose(ore)"
+                print "UI.info(ore)"
+                print "UI.row()"
+                print "UI.info(brush.name)"
+                print "UI.button(brush.type)"
+                print "UI.row()"
+                print "UI.info(brush.size.name)"
+                print "UI.field(brush.size)"
+                set init 2
+                set brush.size.name "Radius"
+                sensor en @unit @shooting
+                set brush.name "suqare"
+                jump 30 equal brush.type 0
+                set brush.name "circle"
+                sensor tx @unit @shootX
+                op add tx tx 0.5
+                op idiv tx tx 1
+                sensor ty @unit @shootY
+                op add ty ty 0.5
+                op idiv ty ty 1
+                op sub x.min tx brush.size
+                op idiv x.min x.min 1
+                op add x.max x.min brush.size
+                op add x.max x.max brush.size
+                op sub y.min ty brush.size
+                op idiv y.min y.min 1
+                op add y.max y.min brush.size
+                op add y.max y.max brush.size
+                set x x.min
+                op add x x 1
+                set y y.min
+                op add y y 1
+                jump 53 equal brush.type 0
+                op sub dx x tx
+                op sub dy y ty
+                op len d dx dy
+                jump 57 greaterThan d brush.size
+                effect lightBlock x y 0.5 %ffbd530f\s
+                jump 57 notEqual en 1
+                setblock floor floor x y @derelict 0
+                setblock ore ore x y @derelict 0
+                jump 47 lessThan y y.max
+                setrate ipt
+                jump 45 lessThan x x.max
+                """)));
             code = codes.first();
             readCode(code.value);
 
@@ -829,15 +829,22 @@ public class FullAI extends AIController{
 
         public boolean printUI(PrintI inst){
             //format: UI.type(var)
+            var value = inst.value;
             String str;
-            if(inst.value.isobj){
-                str = LExecutor.PrintI.toString(inst.value.objval);
+
+            if(value.isobj){
+                str = LExecutor.PrintI.toString(value.objval);
             }else{
-                str = String.valueOf(inst.value.numval);
+                //display integer version when possible
+                if(Math.abs(value.numval - Math.round(value.numval)) < 0.00001){
+                    str = String.valueOf(Math.round(value.numval));
+                }else{
+                    str = String.valueOf(value.numval);
+                }
             }
 
             if(!str.endsWith(")")) return false;
-            String[] blocks = str.substring(0, str.length() - 1).split("\\.|\\(", 3);
+            String[] blocks = str.substring(0, str.length() - 1).split("[.(]", 3);
 
             if(blocks.length < 2 || !blocks[0].equals("UI")) return false;
             var type = blocks[1];
@@ -860,7 +867,7 @@ public class FullAI extends AIController{
                         case "button" -> customAIUITable.button(targetName, textbtoggle, () -> lvar.setbool(!lvar.bool())).update(tb -> tb.setChecked(lvar.bool()));
                         case "field" -> customAIUITable.field(String.valueOf(lvar.num()), TextField.TextFieldFilter.floatsOnly, s -> lvar.setnum(Strings.parseDouble(s, 0)));
                         case "choose" -> {
-                            if(lvar.isobj && !(lvar.objval instanceof MappableContent)) return false;
+                            if(lvar.isobj && !(lvar.obj() instanceof MappableContent)) return false;
                             customAIUITable.button(targetName, textb, () -> {
                                 chooseContentTable.clear();
                                 chooseContentTable.addDragMove();
@@ -872,6 +879,7 @@ public class FullAI extends AIController{
                             });
                         }
                         case "info" -> {
+
                             customAIUITable.add("").fill().with(b -> {
                                 b.setFontScale(0.7f);
                                 b.clicked(() -> b.cullable = !b.cullable);
@@ -894,7 +902,7 @@ public class FullAI extends AIController{
             return false;
         }
 
-        public <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, boolean closeSelect, int rows, int columns){
+        public static <T extends UnlockableContent> void buildTable(Table table, Seq<T> items, Prov<T> holder, Cons<T> consumer, boolean closeSelect, int rows, int columns){
             ButtonGroup<ImageButton> group = new ButtonGroup<>();
             group.setMinCheckCount(0);
             Table cont = new Table().top();
@@ -931,7 +939,7 @@ public class FullAI extends AIController{
             table.top().add(main);
         }
 
-        public class LogicModeCode{
+        public static class LogicModeCode{
             String name;
             String value;
             public LogicModeCode(){}

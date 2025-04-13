@@ -69,7 +69,7 @@ public class EmojiMindow extends Mindow2{
                 }).with(funcSetTextb).get().getLabel().setFontScale(1.5f);
                 listt.row();
             });
-        }catch(Exception e){Log.err(e);}
+        }catch(Exception ignore){Log.err(ignore);}
 
         titlePane.table(t -> {
             t.button("" + Iconc.list, textbtoggle, () -> {

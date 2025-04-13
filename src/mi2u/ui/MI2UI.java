@@ -10,7 +10,6 @@ import arc.util.*;
 import mi2u.*;
 import mi2u.game.*;
 import mi2u.input.*;
-import mi2u.io.SettingHandler;
 import mi2u.io.SettingHandler.*;
 import mi2u.ui.elements.*;
 import mindustry.*;
@@ -21,6 +20,7 @@ import mindustry.ui.*;
 import mindustry.world.blocks.*;
 
 import static mi2u.MI2UVars.*;
+import static mi2u.io.SettingHandler.TextFieldSetting.*;
 import static mindustry.Vars.*;
 
 public class MI2UI extends Mindow2{
@@ -310,7 +310,7 @@ public class MI2UI extends Mindow2{
         settings.checkPref("enUnitHitbox", false).tag(false, false, true);
         settings.checkPref("enUnitLogic", false).tag(false, false, true);
         settings.checkPref("enUnitPath", false).tag(false, false, true);
-        settings.textPref("enUnitPath.length", String.valueOf(60), TextField.TextFieldFilter.digitsOnly, s -> Strings.parseInt(s) >= 10 && Strings.parseInt(s) <= 300, null, SettingHandler.intParser).tag(false, false, true);
+        settings.textPref("enUnitPath.length", String.valueOf(60), TextField.TextFieldFilter.digitsOnly, s -> Strings.parseInt(s) >= 10 && Strings.parseInt(s) <= 300, null, intParser).tag(false, false, true);
 
         settings.title("graphics.drawGroups");
 
@@ -321,7 +321,7 @@ public class MI2UI extends Mindow2{
 
         settings.title("game.speedctrl");
 
-        settings.textPref("speedctrl.basefps", String.valueOf(60), TextField.TextFieldFilter.digitsOnly, s -> Strings.parseInt(s) >= 10 && Strings.parseInt(s) <= 600, null, SettingHandler.intParser);
+        settings.textPref("speedctrl.basefps", String.valueOf(60), TextField.TextFieldFilter.digitsOnly, s -> Strings.parseInt(s) >= 10 && Strings.parseInt(s) <= 600, null, intParser);
         settings.sliderPref("speedctrl.cutoff", 1, 0, 5, 1, s -> s + "fps");
 
         settings.title("input");
@@ -341,13 +341,13 @@ public class MI2UI extends Mindow2{
 
         settings.title("modify");
 
-        settings.textPref("blockSelectTableHeight", String.valueOf(194), TextField.TextFieldFilter.digitsOnly, s -> Strings.parseInt(s) >= 60 && Strings.parseInt(s) <= 810, null, SettingHandler.intParser).tag(false, true, false);
+        settings.textPref("blockSelectTableHeight", String.valueOf(194), TextField.TextFieldFilter.digitsOnly, s -> Strings.parseInt(s) >= 60 && Strings.parseInt(s) <= 810, null, intParser).tag(false, true, false);
         settings.checkPref("modifyBlockBars", false).tag(false, true, false);
         settings.checkPref("replaceTopTable", false).tag(false, true, false);
         settings.checkPref("modTopTableFollowMouse", false).tag(false, true, false);
         settings.sliderPref("maxSchematicSize", 64, 32, 1024, 16, s -> String.valueOf(s), s -> Vars.maxSchematicSize = s);
-        settings.textPref("maxZoom", String.valueOf(renderer.maxZoom), TextField.TextFieldFilter.floatsOnly, s -> Strings.parseFloat(s) > renderer.minZoom && Strings.parseFloat(s) <= 100, s -> renderer.maxZoom = Strings.parseFloat(s), SettingHandler.floatParser);
-        settings.textPref("minZoom", String.valueOf(renderer.minZoom), TextField.TextFieldFilter.floatsOnly, s -> Strings.parseFloat(s) < renderer.maxZoom && Strings.parseFloat(s) > 0.01f, s -> renderer.minZoom = Strings.parseFloat(s), SettingHandler.floatParser);
+        settings.textPref("maxZoom", String.valueOf(renderer.maxZoom), TextField.TextFieldFilter.floatsOnly, s -> Strings.parseFloat(s) > renderer.minZoom && Strings.parseFloat(s) <= 100, s -> renderer.maxZoom = Strings.parseFloat(s), floatParser);
+        settings.textPref("minZoom", String.valueOf(renderer.minZoom), TextField.TextFieldFilter.floatsOnly, s -> Strings.parseFloat(s) < renderer.maxZoom && Strings.parseFloat(s) > 0.01f, s -> renderer.minZoom = Strings.parseFloat(s), floatParser);
 
         settings.checkPref("enableUpdate", true);
     }
