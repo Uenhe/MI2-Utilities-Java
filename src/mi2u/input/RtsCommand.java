@@ -8,6 +8,8 @@ import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.input.*;
+import mindustry.type.Category;
+import mindustry.world.Block;
 import mindustry.world.blocks.units.*;
 import mindustry.world.meta.*;
 
@@ -23,7 +25,7 @@ public class RtsCommand{
     public static long doubleTapInterval = mi2ui.settings.getInt("rtsFormDoubleTap", 300);
 
 
-    public static boolean lowHealthBack = false;    //TODO formation auto control
+    public static boolean lowHealthBack = false; //TODO formation auto control
 
     public static void init(){
         for(int i = 0; i < 10; i++){
@@ -76,7 +78,7 @@ public class RtsCommand{
             //force block selection short-cut to switch category
             MI2Utils.setValue(ui.hudfrag.blockfrag, "blockSelectEnd", true);
             //cancel any stored block selections
-            ObjectMap selectBlocks = MI2Utils.getValue(ui.hudfrag.blockfrag, "selectedBlocks");
+            ObjectMap<Category, Block> selectBlocks = MI2Utils.getValue(ui.hudfrag.blockfrag, "selectedBlocks");
             selectBlocks.each((cat, block) -> selectBlocks.put(cat, null));
             for(int ki = 0; ki < DesktopInputExt.numKey.length; ki++){
                 if(Core.input.keyTap(DesktopInputExt.numKey[ki])){
@@ -91,7 +93,7 @@ public class RtsCommand{
     }
 
     public static class Formation{
-        private static Seq<Unit> tmplows = new Seq<>(), tmpselect;
+        private static final Seq<Unit> tmplows = new Seq<>();
         public int id;
         protected Seq<Unit> all = new Seq<>();
         protected OrderedSet<Unit> lowHps = new OrderedSet<>();
@@ -125,7 +127,7 @@ public class RtsCommand{
 
             if(lowHealthBack){
                 if(timer.get(500)){
-                    tmpselect = control.input.selectedUnits;
+                    Seq<Unit> tmpselect = control.input.selectedUnits;
                     tmplows.clear();
 
                     //标记低血量
@@ -151,7 +153,7 @@ public class RtsCommand{
                             Core.camera.project(MI2UTmp.v2.set(build.x, build.y));
                             control.input.commandTap(MI2UTmp.v2.x, MI2UTmp.v2.y);
 
-                            tmpselect.remove(u -> tmplows.contains(u));
+                            tmpselect.remove(tmplows::contains);
                         }
                         control.input.selectedUnits = tmpselect;
                     }

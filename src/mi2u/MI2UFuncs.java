@@ -33,7 +33,7 @@ public class MI2UFuncs{
 
         boolean touchUp = lastTouches != 0 && ((lastTouches = Core.input.getTouches()) == 0);
 
-        if((control.input instanceof DesktopInput di && Core.input.keyRelease(Binding.break_block))){
+        if((control.input instanceof DesktopInput di && Core.input.keyRelease(Binding.breakBlock))){
             int rawCursorX = World.toTile(Core.input.mouseWorld().x), rawCursorY = World.toTile(Core.input.mouseWorld().y);
             control.input.lastSchematic = schematics.create(di.schemX, di.schemY, rawCursorX, rawCursorY);
             control.input.selectPlans.add(schematics.toPlans(control.input.lastSchematic, rawCursorX, rawCursorY));
